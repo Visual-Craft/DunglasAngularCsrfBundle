@@ -32,6 +32,8 @@ class DunglasAngularCsrfExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('dunglas_angular_csrf.token.id', $config['token']['id']);
+        $container->setParameter('dunglas_angular_csrf.token.submit_method', $config['token']['submit_method']);
+        $container->setParameter('dunglas_angular_csrf.token.name', $config['token']['name']);
         $container->setParameter('dunglas_angular_csrf.cookie.name', $config['cookie']['name']);
         $container->setParameter('dunglas_angular_csrf.cookie.expire', $config['cookie']['expire']);
         $container->setParameter('dunglas_angular_csrf.cookie.path', $config['cookie']['path']);

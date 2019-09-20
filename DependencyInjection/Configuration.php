@@ -34,6 +34,8 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('id')->cannotBeEmpty()->defaultValue('angular')->end()
+                        ->enumNode('submit_method')->values(['header', 'query_string'])->defaultvalue('header')->end()
+                        ->scalarNode('name')->defaultValue('csrf')->end()
                     ->end()
                 ->end()
                 ->arrayNode('header')
