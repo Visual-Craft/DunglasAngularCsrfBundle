@@ -103,8 +103,6 @@ class AngularCsrfValidationListener
         if (!$value || !$this->angularCsrfTokenManager->isTokenValid($value)) {
             throw new AccessDeniedHttpException('Bad CSRF token.');
         }
-
-        $this->unsetQueryStringParameter($event->getRequest());
     }
 
     /**
@@ -122,13 +120,5 @@ class AngularCsrfValidationListener
         }
 
         return null;
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function unsetQueryStringParameter(Request $request)
-    {
-        $request->query->remove($this->tokenName);
     }
 }
