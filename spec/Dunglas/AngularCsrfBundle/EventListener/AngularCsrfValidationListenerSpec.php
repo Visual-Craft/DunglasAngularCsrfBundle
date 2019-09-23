@@ -22,7 +22,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class AngularCsrfValidationListenerSpec extends ObjectBehavior
 {
-    const HEADER_NAME = 'csrf';
+    const INPUT_KEY = 'csrf';
+    const INPUT_METHOD = 'header';
     const VALID_TOKEN = 'valid';
     const INVALID_TOKEN = 'invalid';
 
@@ -47,11 +48,11 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $tokenManager->isTokenValid(self::INVALID_TOKEN)->willReturn(false);
 
         $this->secureValidRequest = $secureValidRequest;
-        $validHeaders->get(self::HEADER_NAME)->willReturn(self::VALID_TOKEN);
+        $validHeaders->get(self::INPUT_KEY)->willReturn(self::VALID_TOKEN);
         $this->secureValidRequest->headers = $validHeaders;
 
         $this->secureInvalidRequest = $secureInvalidRequest;
-        $invalidHeaders->get(self::HEADER_NAME)->willReturn(self::INVALID_TOKEN);
+        $invalidHeaders->get(self::INPUT_KEY)->willReturn(self::INVALID_TOKEN);
         $this->secureInvalidRequest->headers = $invalidHeaders;
 
         $this->unsecureRequest = $unsecureRequest;
@@ -70,7 +71,8 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
             $tokenManager,
             $routeMatcher,
             $this->routes,
-            self::HEADER_NAME,
+            self::INPUT_METHOD,
+            self::INPUT_KEY,
             $this->excluded
         );
     }

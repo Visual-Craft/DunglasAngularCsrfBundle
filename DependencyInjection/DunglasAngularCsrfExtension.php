@@ -32,15 +32,14 @@ class DunglasAngularCsrfExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('dunglas_angular_csrf.token.id', $config['token']['id']);
-        $container->setParameter('dunglas_angular_csrf.token.submit_method', $config['token']['submit_method']);
-        $container->setParameter('dunglas_angular_csrf.token.name', $config['token']['name']);
+        $container->setParameter('dunglas_angular_csrf.token.input_method', $config['token']['input_method']);
+        $container->setParameter('dunglas_angular_csrf.token.input_key', $config['token']['input_key']);
         $container->setParameter('dunglas_angular_csrf.cookie.name', $config['cookie']['name']);
         $container->setParameter('dunglas_angular_csrf.cookie.expire', $config['cookie']['expire']);
         $container->setParameter('dunglas_angular_csrf.cookie.path', $config['cookie']['path']);
         $container->setParameter('dunglas_angular_csrf.cookie.domain', $config['cookie']['domain']);
         $container->setParameter('dunglas_angular_csrf.cookie.secure', $config['cookie']['secure']);
         $container->setParameter('dunglas_angular_csrf.cookie.set_on', $config['cookie']['set_on']);
-        $container->setParameter('dunglas_angular_csrf.header.name', $config['header']['name']);
         $container->setParameter('dunglas_angular_csrf.secure', $config['secure']);
         $container->setParameter('dunglas_angular_csrf.exclude', $config['exclude']);
 

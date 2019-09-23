@@ -24,9 +24,8 @@
             <argument type="service" id="dunglas_angular_csrf.token_manager" />
             <argument type="service" id="dunglas_angular_csrf.route_matcher" />
             <argument>%dunglas_angular_csrf.secure%</argument>
-            <argument>%dunglas_angular_csrf.header.name%</argument>
-            <argument>%dunglas_angular_csrf.token.submit_method%</argument>
-            <argument>%dunglas_angular_csrf.token.name%</argument>
+            <argument>%dunglas_angular_csrf.token.input_method%</argument>
+            <argument>%dunglas_angular_csrf.token.input_key%</argument>
             <argument>%dunglas_angular_csrf.exclude%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="12" />
@@ -37,7 +36,7 @@
             <argument type="service" id="dunglas_angular_csrf.route_matcher" />
             <argument type="service" id="request_stack" />
             <argument>%dunglas_angular_csrf.secure%</argument>
-            <argument>%dunglas_angular_csrf.header.name%</argument>
+            <argument>%dunglas_angular_csrf.token.input_key%</argument>
 
             <tag name="form.type_extension" alias="form" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>

@@ -39,7 +39,7 @@ class DisableCsrfExtension extends AbstractTypeExtension
     /**
      * @var string
      */
-    protected $headerName;
+    protected $tokenInputKey;
 
     /**
      * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -51,19 +51,19 @@ class DisableCsrfExtension extends AbstractTypeExtension
      * @param RouteMatcherInterface   $routeMatcher
      * @param RequestStack            $requestStack
      * @param array                   $routes
-     * @param string                  $headerName
+     * @param string                  $tokenInputKey
      */
     public function __construct(
         AngularCsrfTokenManager $angularCsrfTokenManager,
         RouteMatcherInterface $routeMatcher,
         RequestStack $requestStack,
         array $routes,
-        $headerName
+        $tokenInputKey
     ) {
         $this->angularCsrfTokenManager = $angularCsrfTokenManager;
         $this->routeMatcher = $routeMatcher;
         $this->routes = $routes;
-        $this->headerName = $headerName;
+        $this->tokenInputKey = $tokenInputKey;
         $this->requestStack = $requestStack;
     }
 
@@ -81,7 +81,7 @@ class DisableCsrfExtension extends AbstractTypeExtension
             return;
         }
 
-        $value = $request->headers->get($this->headerName);
+        $value = $request->headers->get($this->tokenInputKey);
 
         if ($this->angularCsrfTokenManager->isTokenValid($value)) {
             $resolver->setDefaults(array(

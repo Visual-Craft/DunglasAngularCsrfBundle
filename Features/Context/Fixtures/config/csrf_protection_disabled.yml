@@ -13,7 +13,8 @@ framework:
 
 dunglas_angular_csrf:
     header:
-        name: X-XSRF-TOKEN
+        input_key: X-XSRF-TOKEN
+        input_method: 'header'
     cookie:
         set_on:
             - { path: ^/$ }

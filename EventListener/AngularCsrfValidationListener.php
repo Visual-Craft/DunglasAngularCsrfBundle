@@ -23,6 +23,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class AngularCsrfValidationListener
 {
+    const TOKEN_INPUT_METHOD_HEADER = 'header';
+    const TOKEN_INPUT_METHOD_QUERY = 'query';
+    const TOKEN_INPUT_METHOD_REQUEST = 'request';
+
     /**
      * @var AngularCsrfTokenManager
      */
@@ -38,15 +42,11 @@ class AngularCsrfValidationListener
     /**
      * @var string
      */
-    protected $headerName;
+    private $tokenInputMethod;
     /**
      * @var string
      */
-    private $tokenSubmitMethod;
-    /**
-     * @var string
-     */
-    private $tokenName;
+    private $tokenInputKey;
     /**
      * @var array
      */
@@ -56,27 +56,24 @@ class AngularCsrfValidationListener
      * @param AngularCsrfTokenManager $angularCsrfTokenManager
      * @param RouteMatcherInterface   $routeMatcher
      * @param array                   $routes
-     * @param string                  $headerName
-     * @param string                  $tokenSubmitMethod
-     * @param string                  $tokenName
+     * @param string                  $tokenInputMethod
+     * @param string                  $tokenInputKey
      * @param array                   $exclude
      */
     public function __construct(
         AngularCsrfTokenManager $angularCsrfTokenManager,
         RouteMatcherInterface $routeMatcher,
         array $routes,
-        $headerName,
-        string $tokenSubmitMethod,
-        string $tokenName,
+        string $tokenInputMethod,
+        string $tokenInputKey,
         array $exclude = array()
     ) {
         $this->angularCsrfTokenManager = $angularCsrfTokenManager;
         $this->routeMatcher = $routeMatcher;
         $this->routes = $routes;
-        $this->headerName = $headerName;
+        $this->tokenInputMethod = $tokenInputMethod;
+        $this->tokenInputKey = $tokenInputKey;
         $this->exclude = $exclude;
-        $this->tokenSubmitMethod = $tokenSubmitMethod;
-        $this->tokenName = $tokenName;
     }
 
     /**
@@ -111,14 +108,19 @@ class AngularCsrfValidationListener
      */
     private function getToken(Request $request)
     {
-        if ('query_string' === $this->tokenSubmitMethod) {
-            return $request->query->get($this->tokenName);
+        switch ($this->tokenInputMethod) {
+            case self::TOKEN_INPUT_METHOD_HEADER:
+                return $request->headers->get($this->tokenInputKey);
+                break;
+            case self::TOKEN_INPUT_METHOD_QUERY:
+                return $request->query->get($this->tokenInputKey);
+                break;
+            case self::TOKEN_INPUT_METHOD_REQUEST:
+                return $request->request->get($this->tokenInputKey);
+                break;
+            default:
+                return null;
+                break;
         }
-
-        if ('header' === $this->tokenSubmitMethod) {
-            return $request->headers->get($this->headerName);
-        }
-
-        return null;
     }
 }
