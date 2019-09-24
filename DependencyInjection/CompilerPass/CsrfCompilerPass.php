@@ -29,5 +29,6 @@ class CsrfCompilerPass implements CompilerPassInterface
         $container->removeDefinition('dunglas_angular_csrf.form.extension.disable_csrf');
         $container->removeDefinition('dunglas_angular_csrf.cookie_listener');
         $container->removeDefinition('dunglas_angular_csrf.token_manager');
+        $container->removeDefinition('dunglas_angular_csrf.token_resolver');
     }
 }
