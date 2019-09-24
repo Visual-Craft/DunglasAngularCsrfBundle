@@ -9,6 +9,7 @@
 
 namespace Dunglas\AngularCsrfBundle\DependencyInjection;
 
+use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenResolver;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -34,7 +35,11 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('id')->cannotBeEmpty()->defaultValue('angular')->end()
-                        ->enumNode('input_method')->values(['header', 'query', 'request'])->defaultvalue('header')->end()
+                        ->enumNode('input_method')->values([
+                            AngularCsrfTokenResolver::TOKEN_INPUT_METHOD_HEADER,
+                            AngularCsrfTokenResolver::TOKEN_INPUT_METHOD_QUERY,
+                            AngularCsrfTokenResolver::TOKEN_INPUT_METHOD_REQUEST,
+                        ])->defaultvalue('header')->end()
                         ->scalarNode('input_key')->defaultValue('X-XSRF-TOKEN')->end()
                     ->end()
                 ->end()

@@ -10,8 +10,8 @@
 namespace Dunglas\AngularCsrfBundle\EventListener;
 
 use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenManager;
+use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenResolver;
 use Dunglas\AngularCsrfBundle\Routing\RouteMatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -23,30 +23,26 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class AngularCsrfValidationListener
 {
-    const TOKEN_INPUT_METHOD_HEADER = 'header';
-    const TOKEN_INPUT_METHOD_QUERY = 'query';
-    const TOKEN_INPUT_METHOD_REQUEST = 'request';
-
     /**
      * @var AngularCsrfTokenManager
      */
     protected $angularCsrfTokenManager;
+
+    /**
+     * @var AngularCsrfTokenResolver
+     */
+    private $angularCsrfTokenResolver;
+
     /**
      * @var RouteMatcherInterface
      */
     protected $routeMatcher;
+
     /**
      * @var array
      */
     protected $routes;
-    /**
-     * @var string
-     */
-    private $tokenInputMethod;
-    /**
-     * @var string
-     */
-    private $tokenInputKey;
+
     /**
      * @var array
      */
@@ -54,25 +50,22 @@ class AngularCsrfValidationListener
 
     /**
      * @param AngularCsrfTokenManager $angularCsrfTokenManager
-     * @param RouteMatcherInterface   $routeMatcher
-     * @param array                   $routes
-     * @param string                  $tokenInputMethod
-     * @param string                  $tokenInputKey
-     * @param array                   $exclude
+     * @param AngularCsrfTokenResolver $angularCsrfTokenResolver
+     * @param RouteMatcherInterface $routeMatcher
+     * @param array $routes
+     * @param array $exclude
      */
     public function __construct(
         AngularCsrfTokenManager $angularCsrfTokenManager,
+        AngularCsrfTokenResolver $angularCsrfTokenResolver,
         RouteMatcherInterface $routeMatcher,
         array $routes,
-        string $tokenInputMethod,
-        string $tokenInputKey,
-        array $exclude = array()
+        array $exclude = []
     ) {
         $this->angularCsrfTokenManager = $angularCsrfTokenManager;
+        $this->angularCsrfTokenResolver = $angularCsrfTokenResolver;
         $this->routeMatcher = $routeMatcher;
         $this->routes = $routes;
-        $this->tokenInputMethod = $tokenInputMethod;
-        $this->tokenInputKey = $tokenInputKey;
         $this->exclude = $exclude;
     }
 
@@ -95,32 +88,10 @@ class AngularCsrfValidationListener
             return;
         }
 
-        $value = $this->getToken($event->getRequest());
+        $value = $this->angularCsrfTokenResolver->resolve($event->getRequest());
 
         if (!$value || !$this->angularCsrfTokenManager->isTokenValid($value)) {
             throw new AccessDeniedHttpException('Bad CSRF token.');
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @return string|null
-     */
-    private function getToken(Request $request)
-    {
-        switch ($this->tokenInputMethod) {
-            case self::TOKEN_INPUT_METHOD_HEADER:
-                return $request->headers->get($this->tokenInputKey);
-                break;
-            case self::TOKEN_INPUT_METHOD_QUERY:
-                return $request->query->get($this->tokenInputKey);
-                break;
-            case self::TOKEN_INPUT_METHOD_REQUEST:
-                return $request->request->get($this->tokenInputKey);
-                break;
-            default:
-                return null;
-                break;
         }
     }
 }

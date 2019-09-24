@@ -10,6 +10,7 @@
 namespace spec\Dunglas\AngularCsrfBundle\EventListener;
 
 use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenManager;
+use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenResolver;
 use Dunglas\AngularCsrfBundle\Routing\RouteMatcherInterface;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -37,6 +38,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
     public function let(
         AngularCsrfTokenManager $tokenManager,
         RouteMatcherInterface $routeMatcher,
+        AngularCsrfTokenResolver $validTokenResolver,
         Request $secureValidRequest,
         Request $secureInvalidRequest,
         Request $unsecureRequest,
@@ -45,11 +47,12 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         HeaderBag $invalidHeaders
     ) {
         $tokenManager->isTokenValid(self::VALID_TOKEN)->willReturn(true);
-        $tokenManager->isTokenValid(self::INVALID_TOKEN)->willReturn(false);
 
         $this->secureValidRequest = $secureValidRequest;
         $validHeaders->get(self::INPUT_KEY)->willReturn(self::VALID_TOKEN);
         $this->secureValidRequest->headers = $validHeaders;
+
+        $validTokenResolver->resolve($secureValidRequest)->willReturn(self::VALID_TOKEN);
 
         $this->secureInvalidRequest = $secureInvalidRequest;
         $invalidHeaders->get(self::INPUT_KEY)->willReturn(self::INVALID_TOKEN);
@@ -69,10 +72,9 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
 
         $this->beConstructedWith(
             $tokenManager,
+            $validTokenResolver,
             $routeMatcher,
             $this->routes,
-            self::INPUT_METHOD,
-            self::INPUT_KEY,
             $this->excluded
         );
     }
@@ -88,14 +90,6 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $event->getRequest()->willReturn($this->secureValidRequest);
 
         $this->onKernelRequest($event);
-    }
-
-    public function it_throws_an_error_when_the_csrf_token_is_bad(GetResponseEvent $event)
-    {
-        $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST);
-        $event->getRequest()->willReturn($this->secureInvalidRequest);
-
-        $this->shouldThrow('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException')->duringOnKernelRequest($event);
     }
 
     public function it_does_not_secure_on_sub_request(GetResponseEvent $event)
