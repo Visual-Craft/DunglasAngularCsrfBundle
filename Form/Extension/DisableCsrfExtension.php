@@ -10,6 +10,7 @@
 namespace Dunglas\AngularCsrfBundle\Form\Extension;
 
 use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenManager;
+use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenResolver;
 use Dunglas\AngularCsrfBundle\Routing\RouteMatcherInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,43 +29,46 @@ class DisableCsrfExtension extends AbstractTypeExtension
      * @var AngularCsrfTokenManager
      */
     protected $angularCsrfTokenManager;
+
+    /**
+     * @var AngularCsrfTokenResolver
+     */
+    private $angularCsrfTokenResolver;
+
     /**
      * @var RouteMatcherInterface
      */
     protected $routeMatcher;
+
     /**
      * @var array
      */
     protected $routes;
-    /**
-     * @var string
-     */
-    protected $headerName;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\RequestStack
+     * @var RequestStack
      */
     protected $requestStack;
 
     /**
      * @param AngularCsrfTokenManager $angularCsrfTokenManager
-     * @param RouteMatcherInterface   $routeMatcher
-     * @param RequestStack            $requestStack
-     * @param array                   $routes
-     * @param string                  $headerName
+     * @param AngularCsrfTokenResolver $angularCsrfTokenResolver
+     * @param RouteMatcherInterface $routeMatcher
+     * @param RequestStack $requestStack
+     * @param array $routes
      */
     public function __construct(
         AngularCsrfTokenManager $angularCsrfTokenManager,
+        AngularCsrfTokenResolver $angularCsrfTokenResolver,
         RouteMatcherInterface $routeMatcher,
         RequestStack $requestStack,
-        array $routes,
-        $headerName
+        array $routes
     ) {
         $this->angularCsrfTokenManager = $angularCsrfTokenManager;
+        $this->angularCsrfTokenResolver = $angularCsrfTokenResolver;
         $this->routeMatcher = $routeMatcher;
-        $this->routes = $routes;
-        $this->headerName = $headerName;
         $this->requestStack = $requestStack;
+        $this->routes = $routes;
     }
 
     /**
@@ -81,12 +85,12 @@ class DisableCsrfExtension extends AbstractTypeExtension
             return;
         }
 
-        $value = $request->headers->get($this->headerName);
+        $value = $this->angularCsrfTokenResolver->resolve($request);
 
         if ($this->angularCsrfTokenManager->isTokenValid($value)) {
-            $resolver->setDefaults(array(
+            $resolver->setDefaults([
                 'csrf_protection' => false,
-            ));
+            ]);
         }
     }
 

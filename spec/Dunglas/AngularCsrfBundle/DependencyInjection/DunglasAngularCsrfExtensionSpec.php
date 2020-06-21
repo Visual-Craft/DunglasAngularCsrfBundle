@@ -28,7 +28,11 @@ class DunglasAngularCsrfExtensionSpec extends ObjectBehavior
     {
         $configs = array(
             'dunglas_angular_csrf' => array(
-                'token' => array('id' => 'myid'),
+                'token' => array(
+                    'id' => 'myid',
+                    'input_key' => 'myheader',
+                    'input_method' => 'query',
+                ),
                 'cookie' => array(
                     'name' => 'cookiename',
                     'expire' => 1312,
@@ -41,7 +45,6 @@ class DunglasAngularCsrfExtensionSpec extends ObjectBehavior
                         array('path' => false, 'route' => false, 'host' => 'example.com', 'methods' => array()),
                     ),
                 ),
-                'header' => array('name' => 'myheader'),
                 'secure' => array(
                     array('path' => '^/lille', 'route' => false, 'host' => false, 'methods' => array()),
                     array('path' => false, 'route' => '^houdain$', 'host' => false, 'methods' => array('GET', 'PATCH')),
@@ -68,13 +71,14 @@ class DunglasAngularCsrfExtensionSpec extends ObjectBehavior
         $container->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
         $container->hasExtension('http://symfony.com/schema/dic/services')->willReturn(false)->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.token.id', $configs['dunglas_angular_csrf']['token']['id'])->shouldBeCalled();
+        $container->setParameter('dunglas_angular_csrf.token.input_key', $configs['dunglas_angular_csrf']['token']['input_key'])->shouldBeCalled();
+        $container->setParameter('dunglas_angular_csrf.token.input_method', $configs['dunglas_angular_csrf']['token']['input_method'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.name', $configs['dunglas_angular_csrf']['cookie']['name'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.expire', $configs['dunglas_angular_csrf']['cookie']['expire'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.path', $configs['dunglas_angular_csrf']['cookie']['path'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.domain', $configs['dunglas_angular_csrf']['cookie']['domain'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.secure', $configs['dunglas_angular_csrf']['cookie']['secure'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.cookie.set_on', $configs['dunglas_angular_csrf']['cookie']['set_on'])->shouldBeCalled();
-        $container->setParameter('dunglas_angular_csrf.header.name', $configs['dunglas_angular_csrf']['header']['name'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.secure', $configs['dunglas_angular_csrf']['secure'])->shouldBeCalled();
         $container->setParameter('dunglas_angular_csrf.exclude', $configs['dunglas_angular_csrf']['exclude'])->shouldBeCalled();
         $container->setDefinition('dunglas_angular_csrf.token_manager', Argument::type('Symfony\Component\DependencyInjection\Definition'))->shouldBeCalled();

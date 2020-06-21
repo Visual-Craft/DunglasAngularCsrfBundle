@@ -10,6 +10,7 @@
 namespace Dunglas\AngularCsrfBundle\EventListener;
 
 use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenManager;
+use Dunglas\AngularCsrfBundle\Csrf\AngularCsrfTokenResolver;
 use Dunglas\AngularCsrfBundle\Routing\RouteMatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -26,18 +27,22 @@ class AngularCsrfValidationListener
      * @var AngularCsrfTokenManager
      */
     protected $angularCsrfTokenManager;
+
+    /**
+     * @var AngularCsrfTokenResolver
+     */
+    private $angularCsrfTokenResolver;
+
     /**
      * @var RouteMatcherInterface
      */
     protected $routeMatcher;
+
     /**
      * @var array
      */
     protected $routes;
-    /**
-     * @var string
-     */
-    protected $headerName;
+
     /**
      * @var array
      */
@@ -45,23 +50,23 @@ class AngularCsrfValidationListener
 
     /**
      * @param AngularCsrfTokenManager $angularCsrfTokenManager
-     * @param RouteMatcherInterface   $routeMatcher
-     * @param array                   $routes
-     * @param string                  $headerName
-     * @param array                   $exclude
+     * @param AngularCsrfTokenResolver $angularCsrfTokenResolver
+     * @param RouteMatcherInterface $routeMatcher
+     * @param array $routes
+     * @param array $exclude
      */
     public function __construct(
         AngularCsrfTokenManager $angularCsrfTokenManager,
+        AngularCsrfTokenResolver $angularCsrfTokenResolver,
         RouteMatcherInterface $routeMatcher,
         array $routes,
-        $headerName,
-        array $exclude = array()
+        array $exclude = []
     ) {
         $this->angularCsrfTokenManager = $angularCsrfTokenManager;
+        $this->angularCsrfTokenResolver = $angularCsrfTokenResolver;
         $this->routeMatcher = $routeMatcher;
         $this->routes = $routes;
         $this->exclude = $exclude;
-        $this->headerName = $headerName;
     }
 
     /**
@@ -83,7 +88,8 @@ class AngularCsrfValidationListener
             return;
         }
 
-        $value = $event->getRequest()->headers->get($this->headerName);
+        $value = $this->angularCsrfTokenResolver->resolve($event->getRequest());
+
         if (!$value || !$this->angularCsrfTokenManager->isTokenValid($value)) {
             throw new AccessDeniedHttpException('Bad CSRF token.');
         }
